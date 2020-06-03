@@ -87,14 +87,10 @@ class Graph:
         vertex_id1 (string): The unique identifier of the first vertex.
         vertex_id2 (string): The unique identifier of the second vertex.
         """
-        # store both vertex 1 and 2 in variables
-        vertex_1, vertex_2 = (
-            self.__vertex_dict[vertex_id1], 
-            self.__vertex_dict[vertex_id2]
-        )
-        # make the vertices neighbors of each other
+        # store both vertex 1 in a variable
+        vertex_1, vertex_2 = self.__vertex_dict[vertex_id1]
+        # make the vertex 2 a neighbor of vertex 1
         vertex_1.add_neighbor(vertex_2)
-        vertex_2.add_neighbor(vertex_1)
         
     def get_vertices(self):
         """
