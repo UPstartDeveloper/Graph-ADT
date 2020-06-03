@@ -216,7 +216,7 @@ class Graph:
         starting_vertex_obj = self.get_vertex(start_id)
 
         # Keep a count of steps taken from start so far
-        steps = 0
+        steps = -1
 
         # Keep a dict of Vertex ids, mapped to their distances from the start
         vertex_distances = dict()
@@ -227,22 +227,25 @@ class Graph:
 
         # Perform a BFS, for only up to the nodes that lie up to
         # a "target_distance" away from the start (only shortest path considered)
-        while queue:
-            # Dequeue the next vertex
-            current_vertex_obj = queue.pop()
-            current_vertex_id = current_vertex_obj.get_id()
-            vertex_distances[current_vertex_id] = steps
+        while steps < target_distance:
+            # init a list of neighbors to process after this iteration
+            neighbors = list()
+            # Dequeue all the vertices in the queue
+            while len(queue) > 0:
+                current_vertex_obj = queue.pop()
+                current_vertex_id = current_vertex_obj.get_id()
+                # add the current vertex to the dict
+                if current_vertex_id not in vertex_distances:
+                    vertex_distances[current_vertex_id] = steps + 1
+                # Keep track of vertices to process on next iteration
+                neighbors.extend(current_vertex_obj.get_neighbors())
             # enqueue the vertices to visit on the next iteration
-            neighbors = current_vertex_obj.get_neighbors()
-            # add the current vertex to the dict
             for neighbor in neighbors:
-                if neighbor.get_id() not in vertex_distances:
-                    queue.append(neighbor)
+                queue.append(neighbor)
             # Increment the steps taken so far
             steps += 1
         
         # Return the ids of the vertices a target distance away
-        # print(vertex_distances)
         return [
             vertex_id for vertex_id in vertex_distances if
             vertex_distances[vertex_id] == target_distance
