@@ -21,7 +21,7 @@ def read_graph_from_file(filename):
         directed_char = lines[0]
         # raise a ValueError if needed
         if not (directed_char == 'G' or directed_char == 'D'):
-            raise ValueError('This line is invalid') 
+            raise ValueError('This graph has an invalid type') 
         is_directed = (directed_char == 'D')
         graph = Graph(is_directed)
         # Use the second line to add the vertices to the graph
