@@ -1,14 +1,10 @@
 import unittest
-from gradescope_utils.autograder_utils.decorators import weight, visibility
 from graphs.graph import Graph
 from util.file_reader import read_graph_from_file
 
 
 class TestGraph(unittest.TestCase):
-    def setUp(self):
-        pass
 
-    @weight(10)
     def test_create_directed_graph(self):
         """Create a graph."""
         graph = Graph(is_directed=True)
@@ -25,7 +21,6 @@ class TestGraph(unittest.TestCase):
         self.assertEqual(len(vertex_b.get_neighbors()), 1)
         self.assertEqual(len(vertex_c.get_neighbors()), 0)
 
-    @weight(10)
     def test_create_undirected_graph(self):
         """Create a graph."""
         graph = Graph(is_directed=False)
@@ -43,7 +38,6 @@ class TestGraph(unittest.TestCase):
         self.assertEqual(len(vertex_c.get_neighbors()), 2)
 
 class TestReadGraphFromFile(unittest.TestCase):
-    @weight(8)
     def test_read_directed_graph_from_file(self):
         filename = 'test_files/graph_small_directed.txt'
         graph = read_graph_from_file(filename)
@@ -60,7 +54,6 @@ class TestReadGraphFromFile(unittest.TestCase):
         self.assertEqual(len(vertex3.get_neighbors()), 1)
         self.assertEqual(len(vertex4.get_neighbors()), 0)
 
-    @weight(8)
     def test_read_undirected_graph_from_file(self):
         filename = 'test_files/graph_small_undirected.txt'
         graph = read_graph_from_file(filename)
@@ -77,14 +70,12 @@ class TestReadGraphFromFile(unittest.TestCase):
         self.assertEqual(len(vertex3.get_neighbors()), 1)
         self.assertEqual(len(vertex4.get_neighbors()), 2)
 
-    @weight(4)
     def test_improper_graph_type(self):
         filename = 'test_files/improper_graph_type.txt'
 
         with self.assertRaises(ValueError) as error:
             graph = read_graph_from_file(filename)
 
-    @weight(8)
     def test_find_shortest_path(self):
         filename = 'test_files/graph_medium_undirected.txt'
         graph = read_graph_from_file(filename)
@@ -93,7 +84,6 @@ class TestReadGraphFromFile(unittest.TestCase):
 
         self.assertEqual(len(path_from_A_to_F), 4)
 
-    @weight(8)
     def test_get_all_vertices_n_away(self):
         filename = 'test_files/graph_medium_undirected.txt'
         graph = read_graph_from_file(filename)
@@ -106,7 +96,7 @@ class TestReadGraphFromFile(unittest.TestCase):
 
         vertices_3_away = graph.find_vertices_n_away('A', 3)
         self.assertEqual(vertices_3_away, ['F'])
-        
+
 
 if __name__ == '__main__':
     unittest.main()

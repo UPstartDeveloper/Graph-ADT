@@ -101,10 +101,6 @@ class Graph:
         """
         return list(self.__vertex_dict.values())
 
-    def get_vertex(self, vertex_id):
-        """Return the vertex with given id."""
-        return self.__vertex_dict[vertex_id]
-
     def contains_id(self, vertex_id):
         return vertex_id in self.__vertex_dict
 
