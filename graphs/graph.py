@@ -198,6 +198,9 @@ class Graph:
     def find_vertices_n_away(self, start_id, target_distance):
         """
         Find and return all vertices n distance away.
+        In this implementation, if a vertex has multiple paths that differ in distance
+        from the starting vertex, then only the shortest distance is used to determine if
+        should be returned or not.
         
         Arguments:
         start_id (string): The id of the start vertex.
@@ -206,4 +209,41 @@ class Graph:
         Returns:
         list<string>: All vertex ids that are `target_distance` away from the start vertex
         """
-        pass
+        # check to make sure we have a valid start_id
+        if not self.contains_id(start_id):
+            raise KeyError("One or both vertices are not in the graph!")
+        # Store the starting vertex in a variable 
+        starting_vertex_obj = self.get_vertex(start_id)
+
+        # Keep a count of steps taken from start so far
+        steps = 0
+
+        # Keep a dict of Vertex ids, mapped to their distances from the start
+        vertex_distances = dict()
+
+        # queue of vertices to visit next
+        queue = deque() 
+        queue.append(starting_vertex_obj)
+
+        # Perform a BFS, for only up to the nodes that lie up to
+        # a "target_distance" away from the start (only shortest path considered)
+        while queue:
+            # Dequeue the next vertex
+            current_vertex_obj = queue.pop()
+            current_vertex_id = current_vertex_obj.get_id()
+            vertex_distances[current_vertex_id] = steps
+            # enqueue the vertices to visit on the next iteration
+            neighbors = current_vertex_obj.get_neighbors()
+            # add the current vertex to the dict
+            for neighbor in neighbors:
+                if neighbor.get_id() not in vertex_distances:
+                    queue.append(neighbor)
+            # Increment the steps taken so far
+            steps += 1
+        
+        # Return the ids of the vertices a target distance away
+        # print(vertex_distances)
+        return [
+            vertex_id for vertex_id in vertex_distances if
+            vertex_distances[vertex_id] == target_distance
+        ]

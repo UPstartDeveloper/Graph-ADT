@@ -7,7 +7,7 @@ from util.file_reader import read_graph_from_file
 if __name__ == '__main__':
 
     # Create the graph
-    """
+    
     graph = Graph(is_directed=True)
 
     # Add some vertices
@@ -25,9 +25,9 @@ if __name__ == '__main__':
     graph.add_edge('B', 'D')
     graph.add_edge('D', 'E')
     graph.add_edge('F', 'G')
-    """
+
     # Or, read a graph in from a file
-    graph = read_graph_from_file('test_files/graph_small_directed.txt')
+    # graph = read_graph_from_file('test_files/graph_small_directed.txt')
 
     # Output the vertices & edges
     # Print vertices
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # Search the graph
     print('Performing BFS traversal...')
-    graph.bfs_traversal('1')
+    graph.bfs_traversal('A')
 
     # Find shortest path
     print('Finding shortest path from vertex A to vertex E...')
