@@ -134,7 +134,7 @@ class Graph:
         queue.append(self.get_vertex(start_id))
 
         while queue:
-            current_vertex_obj = queue.pop()
+            current_vertex_obj = queue.popleft()
             current_vertex_id = current_vertex_obj.get_id()
 
             # Process current node
@@ -188,7 +188,6 @@ class Graph:
                     next_path = current_path + [neighbor.get_id()]
                     vertex_id_to_path[neighbor.get_id()] = next_path
                     queue.append(neighbor)
-                    # print(vertex_id_to_path)
 
         if target_id not in vertex_id_to_path: # path not found
             return None
@@ -232,7 +231,7 @@ class Graph:
             neighbors = list()
             # Dequeue all the vertices in the queue
             while len(queue) > 0:
-                current_vertex_obj = queue.pop()
+                current_vertex_obj = queue.popleft()
                 current_vertex_id = current_vertex_obj.get_id()
                 # add the current vertex to the dict
                 if current_vertex_id not in vertex_distances:
@@ -250,3 +249,44 @@ class Graph:
             vertex_id for vertex_id in vertex_distances if
             vertex_distances[vertex_id] == target_distance
         ]
+
+    def is_bipartite(self):
+        """Return True if the graph is bipartite, False otherwise."""
+        # init a queue
+        queue = deque()
+        # keep track of objects seen so far
+        seen = set()
+        # keep track of groups in dict
+        vertex_groups = dict()
+        # pick a random vertex to start
+        start_id = list(self.__vertex_dict.keys())[0]
+        # enqueue the starting vertex, and assign it a group
+        queue.append((self.__vertex_dict[start_id], 1))
+        vertex_groups[start_id] = 1
+        # perform BFS
+        while queue:
+            # process the vertex at the front of the queue
+            current_vertex_obj, current_group_num = queue.pop()
+            current_vertex_id = current_vertex_obj.get_id()
+            seen.add(current_vertex_id)
+            # enqueue the neighbors, and assign them a group
+            neighbors = current_vertex_obj.get_neighbors()
+            for neighbor in neighbors:
+                # if you hit a vertex that has a number already has group 
+                # AND different from what's allowed, return FALSE
+                try:
+                    neighbor_group_num = vertex_groups[neighbor.__id]
+                    if neighbor_group_num == current_group_num:
+                        return False
+                # assign groups: 
+                # neighbors should be of different groups
+                except KeyError:
+                    if neighbor.get_id() not in seen:
+                        group_to_assign = current_group_num ^ 1
+                        vertex_groups[current_vertex_id] = group_to_assign
+                        queue.appendleft((neighbor, group_to_assign))
+        return True
+
+    def get_connected_components(self):
+        """Return a list of connected components."""
+        pass
