@@ -288,10 +288,41 @@ class Graph:
         return True
 
     def get_connected_components(self):
-        """Return a list of connected components."""
-        pass
+        """Return a 2D list of connected components.
+           Each of the inner lists contains vertex ids.
+           A connected component of a graph is a set
+           of vertices for which there is a path between any pair of vertices.
 
-    def dfs_for_cycles(start_vertex, visited):
+        """
+        # set for all previous seen vertices
+        seen = set()
+        # pick the start vertex of the traversal
+        start_id = list(self.__vertex_dict.keys())[0]
+        start_vertex =  self.__vertex_dict[start_id]
+        # loop over all vertices in graph
+        queue = deque()
+        # add the start vertex to the queue and set
+        queue.append(start_vertex)
+        set.add(start_vertex)
+        # execute BFS - init list for connected components
+        connected_comp = []
+        while queue:
+            # dequeue a vertex
+            current_vertex = queue.pop()
+            # enqueue the neighbors to keep th BFS going
+            neighbors = current_vertex.get_neighbors()
+            queue.extend([n for n in neighbors if n not in seen])
+            # look at its neighbors to see if it's a connected component
+            for neighbor in neighbors():
+                # if not a connected component, then break out
+                if neighbor.get_neighbors() != neighbors:
+                    break
+            # if you made it here, looks like we have a connected component
+            connected_comp.append(neighbors)
+        # return the connected components
+        return connected_comp
+
+    def dfs_for_cycles(self, start_vertex, visited):
         """This is recursive. Don't forget it!"""
         # visit this vertex
         visited.append(start_vertex)
