@@ -290,3 +290,36 @@ class Graph:
     def get_connected_components(self):
         """Return a list of connected components."""
         pass
+
+    def dfs_for_cycles(start_vertex, visited):
+        """This is recursive. Don't forget it!"""
+        # visit this vertex
+        visited.append(start_vertex)
+        neighbors = start_vertex.get_neighbors()
+        # if cycle is found
+        if len(neighbors) > 1 and neighbors in visited:
+             return True
+        for neighbor in start_vertex.get_neighbors():
+            if neighbor not in visited:
+                dfs_for_cycles(neighbor, visited)
+
+
+    def contains_cycle(self):
+        """Returns True if the Graph contains a cycle."""
+        # pick vertex to start with randomly 
+        start_id = list(self.__vertex_dict.keys())[0]
+        start_vertex =  self.__vertex_dict[start_id]
+        # init a current_path list
+        current_path = []
+        # pass these two vars above into dfs()
+        is_cycle = dfs_for_cycles(start_vertex, current_path)
+        # final return value
+        return (is_cycle == True)
+
+# Trace for Contains Cycles method:
+# visited = current_path
+# start_vertex = A
+# [A, B]
+
+# neighbors 
+# [B, C]
