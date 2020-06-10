@@ -360,16 +360,22 @@ class Graph:
         Use DFS with a stack to find a path from start_id to target_id.
         """
         # Make a stack containing only the start node
-        start_id = list(self.__vertex_dict.keys())[0]
         start_vertex =  self.__vertex_dict[start_id]
         stack = [start_vertex]
         # Init 'distances' dictionary with the start node at distance 0
-        distances = {start_vertex: stack}
+        distances = {start_id: stack}
         # While the stack is not empty
         while len(stack) > 0:
             # Pop a node from the stack.
-            node = stack.pop()
-            # For each of the node’s neighbors M:
-            # If the neighbor has already been visited, skip it.
-            # 'Visit' the neighbor by adding it to the stack and to the distances dictionary. Its distance is defined as N’s distance + 1.
-        # Look up the target node in the `distances` dictionary and return its distance.
+            node = self.__vertex_dict[stack.pop()]
+            # For each of the node’s neighbors:
+            for neighbor in node.get_neighbors():
+                # If the neighbor has already been visited, skip it.
+                if neighbor not in distances:
+                    # 'Visit' the neighbor - add to stack and distances
+                    stack.append(neighbor)
+                    distance_to_neighbor = distances[node]
+                    distance_to_neighbor.append(neighbor)
+                    distances[neighbor] = distance_to_neighbor
+        # Look up the target node in distances
+        return len(distances[target_id])
