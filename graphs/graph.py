@@ -275,7 +275,7 @@ class Graph:
                 # if you hit a vertex that has a number already has group 
                 # AND different from what's allowed, return FALSE
                 try:
-                    neighbor_group_num = vertex_groups[neighbor.__id]
+                    neighbor_group_num = vertex_groups[neighbor.get_id()]
                     if neighbor_group_num == current_group_num:
                         return False
                 # assign groups: 
@@ -286,14 +286,14 @@ class Graph:
                         vertex_groups[current_vertex_id] = group_to_assign
                         queue.appendleft((neighbor, group_to_assign))
         return True
-
-    def get_connected_components(self):
-        """Return a 2D list of connected components.
+    """
+    def find_connected_components(self):
+        '''Return a 2D list of connected components.
            Each of the inner lists contains vertex ids.
            A connected component of a graph is a set
            of vertices for which there is a path between any pair of vertices.
 
-        """
+        '''
         # set for all previous seen vertices
         seen = set()
         # pick the start vertex of the traversal
@@ -303,7 +303,7 @@ class Graph:
         queue = deque()
         # add the start vertex to the queue and set
         queue.append(start_vertex)
-        set.add(start_vertex)
+        seen.add(start_vertex)
         # execute BFS - init list for connected components
         connected_comp = []
         while queue:
@@ -313,7 +313,7 @@ class Graph:
             neighbors = current_vertex.get_neighbors()
             queue.extend([n for n in neighbors if n not in seen])
             # look at its neighbors to see if it's a connected component
-            for neighbor in neighbors():
+            for neighbor in neighbors:
                 # if not a connected component, then break out
                 if set(neighbor.get_neighbors()) != set(neighbors):
                     break
@@ -321,6 +321,7 @@ class Graph:
             connected_comp.append(neighbors)
         # return the connected components
         return connected_comp
+    """
 
     def dfs_for_cycles(self, start_vertex, visited):
         """This is recursive. Don't forget it!"""
@@ -332,7 +333,7 @@ class Graph:
              return True
         for neighbor in start_vertex.get_neighbors():
             if neighbor not in visited:
-                dfs_for_cycles(neighbor, visited)
+                self.dfs_for_cycles(neighbor, visited)
 
 
     def contains_cycle(self):
@@ -343,7 +344,7 @@ class Graph:
         # init a current_path list
         current_path = []
         # pass these two vars above into dfs()
-        is_cycle = dfs_for_cycles(start_vertex, current_path)
+        is_cycle = self.dfs_for_cycles(start_vertex, current_path)
         # final return value
         return (is_cycle == True)
 
@@ -361,21 +362,22 @@ class Graph:
         """
         # Make a stack containing only the start node
         start_vertex =  self.__vertex_dict[start_id]
-        stack = [start_vertex]
+        stack = [start_id]
         # Init 'distances' dictionary with the start node at distance 0
-        distances = {start_id: stack}
+        distances = {start_id: stack.copy()}
         # While the stack is not empty
         while len(stack) > 0:
             # Pop a node from the stack.
             node = self.__vertex_dict[stack.pop()]
             # For each of the node’s neighbors:
             for neighbor in node.get_neighbors():
+                neighbor_id = neighbor.get_id()
                 # If the neighbor has already been visited, skip it.
-                if neighbor not in distances:
+                if neighbor_id not in distances:
                     # 'Visit' the neighbor - add to stack and distances
-                    stack.append(neighbor)
-                    distance_to_neighbor = distances[node]
-                    distance_to_neighbor.append(neighbor)
-                    distances[neighbor] = distance_to_neighbor
+                    stack.append(neighbor_id)
+                    distance_to_neighbor = distances[node.get_id()].copy()
+                    distance_to_neighbor.append(neighbor_id)
+                    distances[neighbor_id] = distance_to_neighbor
         # Look up the target node in distances
-        return len(distances[target_id])
+        return distances[target_id]
