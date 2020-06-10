@@ -315,7 +315,7 @@ class Graph:
             # look at its neighbors to see if it's a connected component
             for neighbor in neighbors():
                 # if not a connected component, then break out
-                if neighbor.get_neighbors() != neighbors:
+                if set(neighbor.get_neighbors()) != set(neighbors):
                     break
             # if you made it here, looks like we have a connected component
             connected_comp.append(neighbors)
@@ -354,3 +354,22 @@ class Graph:
 
 # neighbors 
 # [B, C]
+
+    def find_path_dfs_iter(self, start_id, target_id):
+        """
+        Use DFS with a stack to find a path from start_id to target_id.
+        """
+        # Make a stack containing only the start node
+        start_id = list(self.__vertex_dict.keys())[0]
+        start_vertex =  self.__vertex_dict[start_id]
+        stack = [start_vertex]
+        # Init 'distances' dictionary with the start node at distance 0
+        distances = {start_vertex: stack}
+        # While the stack is not empty
+        while len(stack) > 0:
+            # Pop a node from the stack.
+            node = stack.pop()
+            # For each of the node’s neighbors M:
+            # If the neighbor has already been visited, skip it.
+            # 'Visit' the neighbor by adding it to the stack and to the distances dictionary. Its distance is defined as N’s distance + 1.
+        # Look up the target node in the `distances` dictionary and return its distance.
