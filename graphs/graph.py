@@ -261,30 +261,35 @@ class Graph:
         # pick a random vertex to start
         start_id = list(self.__vertex_dict.keys())[0]
         # enqueue the starting vertex, and assign it a group
-        queue.append((self.__vertex_dict[start_id], 1))
-        vertex_groups[start_id] = 1
+        queue.append((self.__vertex_dict[start_id], 0))
+        vertex_groups[start_id] = 0
         # perform BFS
         while queue:
             # process the vertex at the front of the queue
             current_vertex_obj, current_group_num = queue.pop()
+            print(f'Current group num: {current_vertex_obj, current_group_num}')
             current_vertex_id = current_vertex_obj.get_id()
             seen.add(current_vertex_id)
             # enqueue the neighbors, and assign them a group
             neighbors = current_vertex_obj.get_neighbors()
             for neighbor in neighbors:
-                # if you hit a vertex that has a number already has group 
-                # AND different from what's allowed, return FALSE
-                try:
+                # if you hit a vertex that has a number already,
+                # AND which different from what's allowed, return FALSE
+                neighbor_id = neighbor.get_id()
+                print(vertex_groups)
+                if neighbor_id in vertex_groups.keys():
                     neighbor_group_num = vertex_groups[neighbor.get_id()]
                     if neighbor_group_num == current_group_num:
+                        print(vertex_groups)
+                        print(f"{neighbor_id} has the worong group num: {neighbor_group_num}")
                         return False
-                # assign groups: 
+                # enqueue neighbors and assign groups: 
                 # neighbors should be of different groups
-                except KeyError:
-                    if neighbor.get_id() not in seen:
-                        group_to_assign = current_group_num ^ 1
-                        vertex_groups[current_vertex_id] = group_to_assign
-                        queue.appendleft((neighbor, group_to_assign))
+                elif neighbor.get_id() not in seen:
+                    group_to_assign = 1 if current_group_num == 0 else 1
+                    print(f'group_to_assign: {neighbor_id, group_to_assign}')
+                    vertex_groups[neighbor_id] = group_to_assign
+                    queue.appendleft((neighbor, group_to_assign))
         return True
     """
     def find_connected_components(self):
