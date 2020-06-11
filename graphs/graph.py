@@ -331,27 +331,48 @@ class Graph:
     def dfs_for_cycles(self, start_vertex, visited):
         """This is recursive. Don't forget it!"""
         # visit this vertex
-        visited.append(start_vertex)
+        visited.add(start_vertex)
         neighbors = start_vertex.get_neighbors()
         # if cycle is found
-        if len(neighbors) > 1 and neighbors in visited:
+        if len(neighbors) > 1 and set(neighbors) <= visited:
              return True
-        for neighbor in start_vertex.get_neighbors():
+        for neighbor in neighbors:
             if neighbor not in visited:
                 self.dfs_for_cycles(neighbor, visited)
+        # return True
 
 
-    def contains_cycle(self):
+    def contains_cycle(self, start_vertex=None, visited=None):
         """Returns True if the Graph contains a cycle."""
         # pick vertex to start with randomly 
-        start_id = list(self.__vertex_dict.keys())[0]
-        start_vertex =  self.__vertex_dict[start_id]
-        # init a current_path list
-        current_path = []
+        if start_vertex is None:
+            start_id = list(self.__vertex_dict.keys())[0]
+            start_vertex =  self.__vertex_dict[start_id]
+        # init a visited set
+        if visited is None:
+            visited = set()
         # pass these two vars above into dfs()
-        is_cycle = self.dfs_for_cycles(start_vertex, current_path)
+        is_cycle = self.dfs_for_cycles(start_vertex, visited)
+        print(f'Is it a Cycle: {is_cycle}')
         # final return value
         return (is_cycle == True)
+        """
+        # on first call, init the start_vertex
+        if start_vertex is None:
+            start_id = list(self.__vertex_dict.keys())[0]
+            start_vertex =  self.__vertex_dict[start_id]
+        # visit this vertex
+        visited.add(start_vertex)
+        for neighbor in start_vertex.get_neighbors():
+            if neighbor not in visited:
+                self.contains_cycle(neighbor, visited)
+            else:
+                return True
+        # if no cycle found, but more connected components to search
+        pass
+        # after all vertices are visited
+        return False
+        """
 
 # Trace for Contains Cycles method:
 # visited = current_path
@@ -386,3 +407,36 @@ class Graph:
                     distances[neighbor_id] = distance_to_neighbor
         # Look up the target node in distances
         return distances[target_id]
+
+    def topological_sort(self):
+        """Return a list of vertex ids in topological order."""
+        # TODO: Create a stack to hold the vertex ordering. 
+        solution_stack = list()
+        # set of visited vertices; only DFS on vertices not visited yet
+        visited = set()
+        # TODO: For each unvisited vertex, execute a DFS from that vertex.
+        # start_id = list(self.__vertex_dict.keys())[0]
+        # start_vertex =  self.__vertex_dict[start_id]
+        # TODO: On the way back up the recursion tree (that is, after visiting a 
+               # vertex's neighbors), add the vertex to the stack.
+        for vertex in self.__vertex_dict.values():
+            visited, solution_stack = self.dfs(vertex, solution_stack, visited)
+        print(f'Solution stack: {solution_stack}')
+        # TODO: Reverse the contents of the stack and return it as a valid ordering.
+        solution = list()
+        for vertex in solution_stack:
+            solution.append(solution_stack.pop().__id)
+        print(f'Solution: {solution}')
+        return solution
+        
+    def dfs(self, vertex, solution_stack, visited):
+        """This is recursive. Don't forget it!"""
+        neighbors = vertex.get_neighbors()
+        visited.add(vertex)
+        # visit neighbors
+        for neighbor in neighbors:
+            if neighbor not in visited:
+                self.dfs(neighbor, solution_stack, visited)
+        # visit this vertex
+        solution_stack.append(vertex)
+        return visited, solution_stack
