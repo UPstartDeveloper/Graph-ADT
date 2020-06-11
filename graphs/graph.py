@@ -267,7 +267,7 @@ class Graph:
         while queue:
             # process the vertex at the front of the queue
             current_vertex_obj, current_group_num = queue.pop()
-            print(f'Current group num: {current_vertex_obj, current_group_num}')
+            # print(f'Current group num: {current_vertex_obj, current_group_num}')
             current_vertex_id = current_vertex_obj.get_id()
             seen.add(current_vertex_id)
             # enqueue the neighbors, and assign them a group
@@ -276,18 +276,18 @@ class Graph:
                 # if you hit a vertex that has a number already,
                 # AND which different from what's allowed, return FALSE
                 neighbor_id = neighbor.get_id()
-                print(vertex_groups)
+                # print(vertex_groups)
                 if neighbor_id in vertex_groups.keys():
                     neighbor_group_num = vertex_groups[neighbor.get_id()]
                     if neighbor_group_num == current_group_num:
-                        print(vertex_groups)
-                        print(f"{neighbor_id} has the worong group num: {neighbor_group_num}")
+                        # print(vertex_groups)
+                        # print(f"{neighbor_id} has the worong group num: {neighbor_group_num}")
                         return False
                 # enqueue neighbors and assign groups: 
                 # neighbors should be of different groups
                 elif neighbor.get_id() not in seen:
-                    group_to_assign = 1 if current_group_num == 0 else 1
-                    print(f'group_to_assign: {neighbor_id, group_to_assign}')
+                    group_to_assign = 1 if current_group_num == 0 else 0
+                    # print(f'group_to_assign: {neighbor_id, group_to_assign}')
                     vertex_groups[neighbor_id] = group_to_assign
                     queue.appendleft((neighbor, group_to_assign))
         return True
