@@ -328,59 +328,52 @@ class Graph:
         return connected_comp
     """
 
-    def dfs_for_cycles(self, start_vertex, visited):
-        """This is recursive. Don't forget it!"""
-        # visit this vertex
+    def dfs_for_cycles(self, start_vertex, visited, current_path):
+        """Recursive implements DFS, specifically for finding out
+           whether the path in a graph leads back where it began.
+
+           Parameters:
+           start_vertex(Vertex): the vertex from where we begin
+           visited(set): all vertices visited so far in the overall graph
+           current_path: all vertices visted within this set of connected components
+
+           Returns: bool
+
+        """
+        has_a_cycle = False
+       # visit this vertex
         visited.add(start_vertex)
+        current_path.append(start_vertex)
         neighbors = start_vertex.get_neighbors()
-        # if cycle is found
-        if len(neighbors) > 1 and set(neighbors) <= visited:
-             return True
         for neighbor in neighbors:
-            if neighbor not in visited:
-                self.dfs_for_cycles(neighbor, visited)
-        # return True
-
-
-    def contains_cycle(self, start_vertex=None, visited=None):
-        """Returns True if the Graph contains a cycle."""
-        # pick vertex to start with randomly 
-        if start_vertex is None:
-            start_id = list(self.__vertex_dict.keys())[0]
-            start_vertex =  self.__vertex_dict[start_id]
-        # init a visited set
-        if visited is None:
-            visited = set()
-        # pass these two vars above into dfs()
-        is_cycle = self.dfs_for_cycles(start_vertex, visited)
-        print(f'Is it a Cycle: {is_cycle}')
-        # final return value
-        return (is_cycle == True)
-        """
-        # on first call, init the start_vertex
-        if start_vertex is None:
-            start_id = list(self.__vertex_dict.keys())[0]
-            start_vertex =  self.__vertex_dict[start_id]
-        # visit this vertex
-        visited.add(start_vertex)
-        for neighbor in start_vertex.get_neighbors():
-            if neighbor not in visited:
-                self.contains_cycle(neighbor, visited)
-            else:
+            if neighbor not in current_path:
+                has_a_cycle = self.dfs_for_cycles(neighbor, visited, current_path)
+            elif neighbor in current_path:
                 return True
-        # if no cycle found, but more connected components to search
-        pass
-        # after all vertices are visited
+        # remove the vertex we move back "up" the call stack
+        current_path.remove(start_vertex)
+        # catch a cycle that's found at the end of a path, after returning
+        # from that stack frame
+        if has_a_cycle is True:
+            return has_a_cycle
+
+
+    def contains_cycle(self):
+        """Returns True if the Graph contains a cycle."""
+        # init a visited set
+        visited = set()
+        # iterate over all vertices
+        for vertex in self.__vertex_dict.values():
+            # execute DFS on every unvisited vertex
+            if vertex not in visited:
+                # keep track of vetices visited so far
+                current_path = list()
+                contains_cycle = self.dfs_for_cycles(vertex, visited, current_path)
+                # cycle found in one of the connected components
+                if contains_cycle is True:
+                    return contains_cycle
+        # after all connected components traversed
         return False
-        """
-
-# Trace for Contains Cycles method:
-# visited = current_path
-# start_vertex = A
-# [A, B]
-
-# neighbors 
-# [B, C]
 
     def find_path_dfs_iter(self, start_id, target_id):
         """
