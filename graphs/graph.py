@@ -410,23 +410,20 @@ class Graph:
 
     def topological_sort(self):
         """Return a list of vertex ids in topological order."""
-        # TODO: Create a stack to hold the vertex ordering. 
+        # Create a stack to hold the vertices
         solution_stack = list()
         # set of visited vertices; only DFS on vertices not visited yet
         visited = set()
-        # TODO: For each unvisited vertex, execute a DFS from that vertex.
-        # start_id = list(self.__vertex_dict.keys())[0]
-        # start_vertex =  self.__vertex_dict[start_id]
-        # TODO: On the way back up the recursion tree (that is, after visiting a 
-               # vertex's neighbors), add the vertex to the stack.
+        # For each unvisited vertex, execute a DFS from that vertex
         for vertex in self.__vertex_dict.values():
-            visited, solution_stack = self.dfs(vertex, solution_stack, visited)
-        print(f'Solution stack: {solution_stack}')
-        # TODO: Reverse the contents of the stack and return it as a valid ordering.
+            if vertex not in visited:
+                visited, solution_stack = (
+                    self.dfs(vertex, solution_stack, visited)
+                )
+        # Reverse the contents of the stack
         solution = list()
-        for vertex in solution_stack:
-            solution.append(solution_stack.pop().__id)
-        print(f'Solution: {solution}')
+        for i in range(len(self.__vertex_dict)):
+            solution.append(solution_stack.pop().get_id())
         return solution
         
     def dfs(self, vertex, solution_stack, visited):
