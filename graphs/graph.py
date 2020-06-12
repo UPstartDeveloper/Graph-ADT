@@ -280,53 +280,58 @@ class Graph:
                 if neighbor_id in vertex_groups.keys():
                     neighbor_group_num = vertex_groups[neighbor.get_id()]
                     if neighbor_group_num == current_group_num:
-                        # print(vertex_groups)
-                        # print(f"{neighbor_id} has the worong group num: {neighbor_group_num}")
                         return False
                 # enqueue neighbors and assign groups: 
                 # neighbors should be of different groups
                 elif neighbor.get_id() not in seen:
                     group_to_assign = 1 if current_group_num == 0 else 0
-                    # print(f'group_to_assign: {neighbor_id, group_to_assign}')
                     vertex_groups[neighbor_id] = group_to_assign
                     queue.appendleft((neighbor, group_to_assign))
         return True
-    """
+
+    def dfs_for_cc(self, vertex, visited, connected):
+        """Returns a list of all verticies within one set of
+           connected components in a Graph object.
+
+           Parameters:
+           vertex(Vertex): the vertex we begin with
+           visited(set): all other Vertex objects visited in the overall
+                         graph so far
+           connected(list): collection of vertices visted so far in this
+                            set of connected components
+
+           Returns: list: all verticies within one set of
+           connected components in a graph
+        
+        """
+        # visit this vertex
+        visited.add(vertex)
+        connected.append(vertex.get_id())
+        # iterate over neighbors
+        neighbors = vertex.get_neighbors()
+        for n in neighbors:
+            if n not in visited:
+                self.dfs_for_cc(n, visited, connected)
+        return connected
+
     def find_connected_components(self):
-        '''Return a 2D list of connected components.
+        """Return a 2D list of connected components.
            Each of the inner lists contains vertex ids.
            A connected component of a graph is a set
            of vertices for which there is a path between any pair of vertices.
 
-        '''
+        """
         # set for all previous seen vertices
-        seen = set()
-        # pick the start vertex of the traversal
-        start_id = list(self.__vertex_dict.keys())[0]
-        start_vertex =  self.__vertex_dict[start_id]
-        # loop over all vertices in graph
-        queue = deque()
-        # add the start vertex to the queue and set
-        queue.append(start_vertex)
-        seen.add(start_vertex)
-        # execute BFS - init list for connected components
-        connected_comp = []
-        while queue:
-            # dequeue a vertex
-            current_vertex = queue.pop()
-            # enqueue the neighbors to keep th BFS going
-            neighbors = current_vertex.get_neighbors()
-            queue.extend([n for n in neighbors if n not in seen])
-            # look at its neighbors to see if it's a connected component
-            for neighbor in neighbors:
-                # if not a connected component, then break out
-                if set(neighbor.get_neighbors()) != set(neighbors):
-                    break
-            # if you made it here, looks like we have a connected component
-            connected_comp.append(neighbors)
+        visited = set()
+        # execute DFS - find all connected components
+        all_connected_components = list()
+        for vertex in self.__vertex_dict.values():
+            if vertex not in visited:
+                components = list()
+                self.dfs_for_cc(vertex, visited, components)
+                all_connected_components.append(components)
         # return the connected components
-        return connected_comp
-    """
+        return all_connected_components
 
     def dfs_for_cycles(self, start_vertex, visited, current_path):
         """Recursive implements DFS, specifically for finding out
@@ -401,6 +406,18 @@ class Graph:
         # Look up the target node in distances
         return distances[target_id]
 
+    def dfs_for_top_sort(self, vertex, solution_stack, visited):
+        """This is recursive. Don't forget it!"""
+        neighbors = vertex.get_neighbors()
+        visited.add(vertex)
+        # visit neighbors
+        for neighbor in neighbors:
+            if neighbor not in visited:
+                self.dfs_for_top_sort(neighbor, solution_stack, visited)
+        # visit this vertex
+        solution_stack.append(vertex)
+        return visited, solution_stack
+
     def topological_sort(self):
         """Return a list of vertex ids in topological order."""
         # Create a stack to hold the vertices
@@ -411,22 +428,11 @@ class Graph:
         for vertex in self.__vertex_dict.values():
             if vertex not in visited:
                 visited, solution_stack = (
-                    self.dfs(vertex, solution_stack, visited)
+                    self.dfs_for_top_sort(vertex, solution_stack, visited)
                 )
         # Reverse the contents of the stack
         solution = list()
         for i in range(len(self.__vertex_dict)):
             solution.append(solution_stack.pop().get_id())
         return solution
-        
-    def dfs(self, vertex, solution_stack, visited):
-        """This is recursive. Don't forget it!"""
-        neighbors = vertex.get_neighbors()
-        visited.add(vertex)
-        # visit neighbors
-        for neighbor in neighbors:
-            if neighbor not in visited:
-                self.dfs(neighbor, solution_stack, visited)
-        # visit this vertex
-        solution_stack.append(vertex)
-        return visited, solution_stack
+
