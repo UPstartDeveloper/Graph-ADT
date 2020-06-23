@@ -435,4 +435,3 @@ class Graph:
         for i in range(len(self.__vertex_dict)):
             solution.append(solution_stack.pop().get_id())
         return solution
-
