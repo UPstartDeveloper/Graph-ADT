@@ -171,3 +171,44 @@ class WeightedGraph(Graph):
 
         # Return the solution list
         return mst_edges
+    
+    '''Prim's Algorithm'''
+
+    def minimum_spanning_tree_prim(self):
+        """
+        Use Prim's Algorithm to return the total weight of all edges in the
+        graph's spanning tree.
+
+        Assume that the graph is connected.
+        """
+        # initialize all vertex distances to INFINITY away
+        vertex_to_weight = dict()
+        for vertex_obj in self.__vertex_dict.values():
+            vertex_to_weight[vertex_obj] = float('inf')
+        # Choose one vertex and set its weight to 0
+        start_vertex = list(vertex_to_weight.keys())[0]
+        vertex_to_weight[start_vertex] = 0
+        # Calculate total weight of MST
+        weight = 0
+        # Find edges for the MST
+        # vertex_obj_just_added = start_vertex
+        while len(list(vertex_to_weight.items())) > 0:
+            # A Get the minimum-weighted remaining vertex
+            min_distance = min(list(vertex_to_weight.values())),
+            min_vertex = None
+            for vertex_obj, weight in vertex_to_weight.items():
+                if weight == min_distance:
+                    min_vertex = vertex_obj
+            # remove it from the dictionary
+            del vertex_to_weight[min_vertex]
+            # add its weight to the total MST weight
+            weight += min_distance
+            # B: Update that vertex's neighbors
+            for neighbor, weight in min_vertex.__neighbors_dict.values():
+                current_distance = vertex_to_weight[neighbor]
+                # Update ONLY to reduce the weight of the distance
+                if weight < current_distance:
+                    vertex_to_weight[neighbor] = current_distance
+
+        # Return total weight of MST
+        return weight
