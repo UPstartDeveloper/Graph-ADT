@@ -190,8 +190,6 @@ class WeightedGraph(Graph):
         vertex_to_weight[start_vertex] = 0
         # Calculate total weight of MST
         weight = 0
-        # Find edges for the MST
-        # vertex_obj_just_added = start_vertex
         while len(list(vertex_to_weight.items())) > 0:
             # A Get the minimum-weighted remaining vertex
             min_distance = min(list(vertex_to_weight.values())),
@@ -212,3 +210,43 @@ class WeightedGraph(Graph):
 
         # Return total weight of MST
         return weight
+
+    '''Shortest Path Finding'''
+
+    def find_shortest_path(self, start_id, target_id):
+        """
+        Use Dijkstra's Algorithm to return the total weight
+        of the shortest path from a start vertex 
+        to a destination.
+        """
+        # A: initialize all vertex distances to INFINITY away
+        vertex_to_weight = dict()
+        for vertex_obj in self.__vertex_dict.values():
+            vertex_to_weight[vertex_obj] = float('inf')
+
+        # B: Calculate the Path Weight
+        path_weight = 0
+        while len(list(vertex_to_weight.items())) > 0:
+            # Get the minimum-distance remaining vertex
+            min_distance = (
+                min(list(vertex_to_weight.values()))
+            )
+            min_vertex = None
+            # remove it from the dictionary
+            del vertex_to_weight[min_vertex]
+            # If target found, return its distance
+            path_weight += min_distance
+            if min_vertex.__id == target_id:
+                return path_weight 
+            # B: Update that vertex's neighbors
+            neighbor_weights = (
+                list(min_vertex.__neighbors_dict.values())
+            )
+            for neighbor, weight in neighbor_weights:
+                current_distance = vertex_to_weight[neighbor]
+                # Update ONLY to reduce the weight of the distance
+                if weight < current_distance:
+                    vertex_to_weight[neighbor] = current_distance
+
+        # target vertex NOT FOUND
+        return None
