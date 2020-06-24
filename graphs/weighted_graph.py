@@ -2,14 +2,15 @@ from graphs.graph import Graph, Vertex
 
 class WeightedVertex(Vertex):
     def __init__(self, vertex_id):
-        """
+        '''
         Initialize a vertex and its neighbors.
 
         Parameters:
         vertex_id (string): A unique identifier to identify this vertex.
-        """
+        '''
         self.__id = vertex_id
         self.__neighbors_dict = {} # id -> (obj, weight)
+        # super(Vertex, self).__init__(vertex_id)
 
     def add_neighbor(self, vertex_obj, weight):
         """
@@ -32,23 +33,24 @@ class WeightedVertex(Vertex):
 
     def get_neighbors_with_weights(self):
         """Return the neighbors of this vertex as a list of tuples of (neighbor_id, weight)."""
-        neighbors = [
+        neighbors_with_weights = [
             (neighbor.__id, weight) for neighbor, weight 
             in list(self.__neighbors_dict.values())
         ]
-        return neighbors
+        return neighbors_with_weights
 
 
 class WeightedGraph(Graph):
     def __init__(self, is_directed=True):
-        """
+        '''
         Initialize a weighted graph object with an empty vertex dictionary.
 
         Parameters:
         is_directed (boolean): Whether the graph is directed (edges go in only one direction).
-        """
+        '''
         self.__vertex_dict = {} # id -> object
         self.__is_directed = is_directed
+        # super().__init__(is_directed)
 
     def add_vertex(self, vertex_id):
         """
@@ -60,8 +62,9 @@ class WeightedGraph(Graph):
         Returns:
         Vertex: The new vertex object.
         """
-        # TODO: Implement this function.
-        pass
+        new_vertex = WeightedVertex(vertex_id)
+        self.__vertex_dict[vertex_id] = new_vertex
+        return new_vertex
 
     def add_edge(self, vertex_id1, vertex_id2, weight):
         """
@@ -71,5 +74,17 @@ class WeightedGraph(Graph):
         vertex_id1 (string): The unique identifier of the first vertex.
         vertex_id2 (string): The unique identifier of the second vertex.
         """
-        # TODO: Implement this function.
-        pass
+        # make sure the vertices are included in the graph
+        all_ids = list(self.__vertex_dict.keys())
+        if (vertex_id1 not in all_ids) or (vertex_id2 not in all_ids):
+            raise ValueError('One or both vertices not found.')
+        # store pointers to the vertices in memory
+        vertex1, vertex2 = (
+            self.__vertex_dict[vertex_id1],
+            self.__vertex_dict[vertex_id2]
+        )
+        # add the edge between vertex 1 and 2
+        vertex1.add_neighbor((vertex2, weight))
+        # if undirected, add the same edge the reverse as well
+        if self.__is_directed is False:
+            vertex2.add_neighbor((vertex1, weight))
