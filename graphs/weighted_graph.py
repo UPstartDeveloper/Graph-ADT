@@ -265,3 +265,38 @@ class WeightedGraph(Graph):
         # target vertex NOT FOUND
         return None
 
+    def floyd_warshall(self):
+        """Returns an adjaceny matrix of all-pairs shortest paths in the
+           graph.
+        
+        """
+        # list of all vertex ids
+        all_vertex_ids = list(self.vertex_dict.keys())
+        # init the distances dict
+        dist = dict()
+        for id in all_vertex_ids:
+            dict_for_top_level = dict()
+            for id2 in all_vertex_ids:
+                dict_for_top_level[id2] = float('inf')
+            dist[id] = dict_for_top_level
+        # init the distances of directly adjacent vertices
+        for id in all_vertex_ids:
+            dist[id][id] = 0
+            vertex = self.ve
+        # build the distances
+        for k in all_vertex_ids:
+            for i in all_vertex_ids:
+                for j in all_vertex_ids:
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+        return dist
+
+"""
+dist              {'A': {'A': inf, 'B': inf, 'C': inf, 'D': inf},  }
+all_vertex_ids = ['A', 'B', 'C', 'D']
+id =             'A'
+dict_for_top_level  {'A': inf, 'B': inf, 'C': inf, 'D': inf}
+
+k   A
+i   A
+j   A
+"""
