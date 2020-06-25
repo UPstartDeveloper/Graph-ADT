@@ -9,8 +9,8 @@ class WeightedVertex(Vertex):
         Parameters:
         vertex_id (string): A unique identifier to identify this vertex.
         '''
-        self.__id = vertex_id
-        self.__neighbors_dict = {} # id -> (obj, weight)
+        self.id = vertex_id
+        self.neighbors_dict = {} # id -> (obj, weight)
         # super(Vertex, self).__init__(vertex_id)
 
     def add_neighbor(self, vertex_obj, weight):
@@ -21,24 +21,38 @@ class WeightedVertex(Vertex):
         vertex_obj (Vertex): An instance of Vertex to be stored as a neighbor.
         weight (int): The edge weight from self -> neighbor.
         """
-        neighbor_id = vertex_obj.__id
-        self.__neighbors_dict[neighbor_id] = (vertex_obj, weight)
+        """neighbor_id = vertex_obj.__id
+        self.__neighbors_dict[neighbor_id] = (vertex_obj, weight)"""
+        if vertex_obj.get_id() in self.neighbors_dict.keys():
+            return # it's already a neighbor
+
+        self.neighbors_dict[vertex_obj.get_id()] = (vertex_obj, weight)
 
     def get_neighbors(self):
         """Return the neighbors of this vertex as a list of neighbor ids."""
         neighbor_ids = [
-            neighbor.__id for neighbor, weight 
-            in list(self.__neighbors_dict.values())
+            neighbor for neighbor, weight 
+            in list(self.neighbors_dict.values())
         ]
         return neighbor_ids
 
     def get_neighbors_with_weights(self):
         """Return the neighbors of this vertex as a list of tuples of (neighbor_id, weight)."""
-        neighbors_with_weights = [
-            (neighbor.__id, weight) for neighbor, weight 
-            in list(self.__neighbors_dict.values())
-        ]
-        return neighbors_with_weights
+        return list(self.neighbors_dict.values())
+
+    def get_id(self):
+        """Return the id of this vertex."""
+        return self.id
+
+    def __str__(self):
+        """Output the list of neighbors of this vertex."""
+        neighbor_ids = [neighbor.get_id() for neighbor in self.get_neighbors()]
+        return f'{self.id} adjacent to {neighbor_ids}'
+
+    def __repr__(self):
+        """Output the list of neighbors of this vertex."""
+        neighbor_ids = [neighbor.get_id() for neighbor in self.get_neighbors()]
+        return f'{self.id} adjacent to {neighbor_ids}'
 
 
 class WeightedGraph(Graph):
@@ -49,8 +63,8 @@ class WeightedGraph(Graph):
         Parameters:
         is_directed (boolean): Whether the graph is directed (edges go in only one direction).
         '''
-        self.__vertex_dict = {} # id -> object
-        self.__is_directed = is_directed
+        self.vertex_dict = {} # id -> object
+        self.is_directed = is_directed
         # super().__init__(is_directed)
 
     def add_vertex(self, vertex_id):
@@ -64,7 +78,7 @@ class WeightedGraph(Graph):
         Vertex: The new vertex object.
         """
         new_vertex = WeightedVertex(vertex_id)
-        self.__vertex_dict[vertex_id] = new_vertex
+        self.vertex_dict[vertex_id] = new_vertex
         return new_vertex
 
     def add_edge(self, vertex_id1, vertex_id2, weight):
@@ -76,18 +90,18 @@ class WeightedGraph(Graph):
         vertex_id2 (string): The unique identifier of the second vertex.
         """
         # make sure the vertices are included in the graph
-        all_ids = list(self.__vertex_dict.keys())
+        all_ids = list(self.vertex_dict.keys())
         if (vertex_id1 not in all_ids) or (vertex_id2 not in all_ids):
             raise ValueError('One or both vertices not found.')
         # store pointers to the vertices in memory
         vertex1, vertex2 = (
-            self.__vertex_dict[vertex_id1],
-            self.__vertex_dict[vertex_id2]
+            self.vertex_dict[vertex_id1],
+            self.vertex_dict[vertex_id2]
         )
         # add the edge between vertex 1 and 2
         vertex1.add_neighbor((vertex2, weight))
         # if undirected, add the same edge the reverse as well
-        if self.__is_directed is False:
+        if self.is_directed is False:
             vertex2.add_neighbor((vertex1, weight))
 
     '''Kruskal's Algorithm'''
@@ -112,11 +126,11 @@ class WeightedGraph(Graph):
             current_vertex_id = current_vertex_obj.get_id()
 
             # Process current node
-            neighbor_weights = list(current_vertex_obj.__neighbors_dict.values())
+            neighbor_weights = list(current_vertex_obj.neighbors_dict.values())
             for neighbor, weight in neighbor_weights:
                 # form the possible element to add to the list
-                weight_edge = (weight, current_vertex_id, neighbor.__id)
-                reverse_weight_edge = (weight, neighbor.__id, current_vertex_id)
+                weight_edge = (weight, current_vertex_id, neighbor.id)
+                reverse_weight_edge = (weight, neighbor.id, current_vertex_id)
                 # add if it's not already inside
                 if weight_edge not in edges and reverse_weight_edge not in edges:
                     edges.append(weight_edge)
@@ -155,17 +169,17 @@ class WeightedGraph(Graph):
         # Initialized so that each vertex is its own parent.
         parent_map = dict()
         for vertex_obj in self.__vertex_dict.values():
-            parent_map[vertex_obj.__id] = vertex_obj.__id
+            parent_map[vertex_obj.id] = vertex_obj.id
         # Create an empty list to hold the solution (i.e. all edges in the 
         # final spanning tree)
         mst_edges = list()
         # Build the MST - loop until we have # edges = # vertices - 1
-        while len(mst_edges) < len(self.__vertex_dict) - 1:
+        while len(mst_edges) < len(self.vertex_dict) - 1:
             # get the smallest edge
             next_edge = edges[0]
             # determine if the edge can be added (must be in different sets)
             weight, vertex1, vertex2 = next_edge
-            if (self.find(parent_map, vertex1.__id) == self.find(parent_map, vertex2.__id)) is False:
+            if (self.find(parent_map, vertex1.id) == self.find(parent_map, vertex2.id)) is False:
                 mst_edges.append(next_edge)
                 edges.remove(next_edge)
 
@@ -183,7 +197,7 @@ class WeightedGraph(Graph):
         """
         # initialize all vertex distances to INFINITY away
         vertex_to_weight = dict()
-        for vertex_obj in self.__vertex_dict.values():
+        for vertex_obj in self.vertex_dict.values():
             vertex_to_weight[vertex_obj] = float('inf')
         # Choose one vertex and set its weight to 0
         start_vertex = list(vertex_to_weight.keys())[0]
@@ -236,11 +250,11 @@ class WeightedGraph(Graph):
             del vertex_to_weight[min_vertex]
             # If target found, return its distance
             path_weight += min_distance
-            if min_vertex.__id == target_id:
+            if min_vertex.id == target_id:
                 return path_weight 
             # B: Update that vertex's neighbors
             neighbor_weights = (
-                list(min_vertex.__neighbors_dict.values())
+                list(min_vertex.neighbors_dict.values())
             )
             for neighbor, weight in neighbor_weights:
                 current_distance = vertex_to_weight[neighbor]
@@ -250,3 +264,4 @@ class WeightedGraph(Graph):
 
         # target vertex NOT FOUND
         return None
+
