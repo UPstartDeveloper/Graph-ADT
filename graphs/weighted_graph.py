@@ -99,10 +99,10 @@ class WeightedGraph(Graph):
             self.vertex_dict[vertex_id2]
         )
         # add the edge between vertex 1 and 2
-        vertex1.add_neighbor((vertex2, weight))
+        vertex1.add_neighbor(vertex2, weight)
         # if undirected, add the same edge the reverse as well
         if self.is_directed is False:
-            vertex2.add_neighbor((vertex1, weight))
+            vertex2.add_neighbor(vertex1, weight)
 
     '''Kruskal's Algorithm'''
 
@@ -117,7 +117,7 @@ class WeightedGraph(Graph):
         seen.add(start_id)
         # queue for visiting vertices in the appropriate order
         queue = deque()
-        queue.append(self.get_vertex(start_id))
+        queue.append(self.vertex_dict[start_id])
         # list of edges
         edges = list()
         # execute BFS
@@ -164,11 +164,12 @@ class WeightedGraph(Graph):
         (start_id, dest_id, weight) in the graph's minimum spanning tree.
         """
         # Create a list of all edges in the graph, sort them by weight 
-        edges = self.sort_edges()
+        start_id = list(self.vertex_dict.keys())[0]
+        edges = self.sort_edges(start_id)
         # Use dictionary 'parent_map' to map vertex -> its "parent". 
         # Initialized so that each vertex is its own parent.
         parent_map = dict()
-        for vertex_obj in self.__vertex_dict.values():
+        for vertex_obj in self.vertex_dict.values():
             parent_map[vertex_obj.id] = vertex_obj.id
         # Create an empty list to hold the solution (i.e. all edges in the 
         # final spanning tree)
@@ -178,13 +179,17 @@ class WeightedGraph(Graph):
             # get the smallest edge
             next_edge = edges[0]
             # determine if the edge can be added (must be in different sets)
-            weight, vertex1, vertex2 = next_edge
-            if (self.find(parent_map, vertex1.id) == self.find(parent_map, vertex2.id)) is False:
-                mst_edges.append(next_edge)
+            weight, vertex1_id, vertex2_id = next_edge
+            if (self.find(parent_map, vertex1_id) == self.find(parent_map, vertex2_id)) is False:
+                # rearrange the edge
+                mst_edge = (vertex1_id, vertex2_id, weight)
+                mst_edges.append(mst_edge)
+                # remove it from the list of possible edges
                 edges.remove(next_edge)
 
         # Return the solution list
-        return mst_edges
+        print(f"Kruskal's Results: {mst_edges}")
+        return sorted(mst_edges)
     
     '''Prim's Algorithm'''
 
@@ -211,12 +216,13 @@ class WeightedGraph(Graph):
             for vertex_obj, weight in vertex_to_weight.items():
                 if weight == min_distance:
                     min_vertex = vertex_obj
-            # remove it from the dictionary
-            del vertex_to_weight[min_vertex]
+                    # remove it from the dictionary
+                    del vertex_to_weight[min_vertex]
             # add its weight to the total MST weight
+            print(f'Min dist: {vertex_to_weight}')
             weight += min_distance
             # B: Update that vertex's neighbors
-            for neighbor, weight in min_vertex.__neighbors_dict.values():
+            for neighbor, weight in min_vertex.neighbors_dict.values():
                 current_distance = vertex_to_weight[neighbor]
                 # Update ONLY to reduce the weight of the distance
                 if weight < current_distance:
@@ -235,7 +241,7 @@ class WeightedGraph(Graph):
         """
         # A: initialize all vertex distances to INFINITY away
         vertex_to_weight = dict()
-        for vertex_obj in self.__vertex_dict.values():
+        for vertex_obj in self.vertex_dict.values():
             vertex_to_weight[vertex_obj] = float('inf')
 
         # B: Calculate the Path Weight
@@ -247,7 +253,10 @@ class WeightedGraph(Graph):
             )
             min_vertex = None
             # remove it from the dictionary
-            del vertex_to_weight[min_vertex]
+            for vertex in vertex_to_weight:
+                if vertex_to_weight[vertex] == min_distance:
+                    min_vertex = vertex
+            del vertex_to_weight[vertex]
             # If target found, return its distance
             path_weight += min_distance
             if min_vertex.id == target_id:
@@ -279,24 +288,19 @@ class WeightedGraph(Graph):
             for id2 in all_vertex_ids:
                 dict_for_top_level[id2] = float('inf')
             dist[id] = dict_for_top_level
-        # init the distances of directly adjacent vertices
+        # update the default distances (v -> v is 0)
         for id in all_vertex_ids:
             dist[id][id] = 0
-            vertex = self.ve
+        # update the distances based on edge weights (v1 -> v2)
+        for id in all_vertex_ids:
+            vertex_obj = self.vertex_dict[id]
+            for id2 in all_vertex_ids:
+                if id != id2:
+                    # get the edge weight
+                    pass
         # build the distances
         for k in all_vertex_ids:
             for i in all_vertex_ids:
                 for j in all_vertex_ids:
                     dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
         return dist
-
-"""
-dist              {'A': {'A': inf, 'B': inf, 'C': inf, 'D': inf},  }
-all_vertex_ids = ['A', 'B', 'C', 'D']
-id =             'A'
-dict_for_top_level  {'A': inf, 'B': inf, 'C': inf, 'D': inf}
-
-k   A
-i   A
-j   A
-"""
