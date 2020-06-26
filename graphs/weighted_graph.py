@@ -188,7 +188,7 @@ class WeightedGraph(Graph):
                 edges.remove(next_edge)
 
         # Return the solution list
-        print(f"Kruskal's Results: {mst_edges}")
+        # print(f"Kruskal's Results: {mst_edges}")
         return sorted(mst_edges)
     
     '''Prim's Algorithm'''
@@ -211,23 +211,24 @@ class WeightedGraph(Graph):
         weight = 0
         while len(list(vertex_to_weight.items())) > 0:
             # A Get the minimum-weighted remaining vertex
-            min_distance = min(list(vertex_to_weight.values())),
+            min_distance = min(list(vertex_to_weight.values()))
             min_vertex = None
             for vertex_obj, weight in vertex_to_weight.items():
                 if weight == min_distance:
                     min_vertex = vertex_obj
-                    # remove it from the dictionary
-                    del vertex_to_weight[min_vertex]
+            # remove it from the dictionary
+            del vertex_to_weight[min_vertex]
             # add its weight to the total MST weight
             print(f'Min dist: {vertex_to_weight}')
             weight += min_distance
             # B: Update that vertex's neighbors
+            print(vertex_to_weight)
             for neighbor, weight in min_vertex.neighbors_dict.values():
-                current_distance = vertex_to_weight[neighbor]
-                # Update ONLY to reduce the weight of the distance
-                if weight < current_distance:
-                    vertex_to_weight[neighbor] = current_distance
-
+                if neighbor in vertex_to_weight:
+                    current_distance = vertex_to_weight[neighbor]
+                    # Update ONLY to reduce the weight of the distance
+                    if weight < current_distance:
+                        vertex_to_weight[neighbor] = weight
         # Return total weight of MST
         return weight
 
@@ -244,18 +245,21 @@ class WeightedGraph(Graph):
         for vertex_obj in self.vertex_dict.values():
             vertex_to_weight[vertex_obj] = float('inf')
 
-        # B: Calculate the Path Weight
+        # B: Calculate the Path Weight, from starting vertex
         path_weight = 0
+        # Choose one vertex and set its weight to 0
+        start_vertex = self.vertex_dict[start_id]
+        vertex_to_weight[start_vertex] = 0
         while len(list(vertex_to_weight.items())) > 0:
             # Get the minimum-distance remaining vertex
-            min_distance = (
-                min(list(vertex_to_weight.values()))
-            )
+            min_distance = min(list(vertex_to_weight.values()))
+            # print(f'Min dist: {min_distance}')
             min_vertex = None
             # remove it from the dictionary
             for vertex in vertex_to_weight:
                 if vertex_to_weight[vertex] == min_distance:
                     min_vertex = vertex
+                    # print(f'Vertex: {vertex}')
             del vertex_to_weight[vertex]
             # If target found, return its distance
             path_weight += min_distance
@@ -266,10 +270,11 @@ class WeightedGraph(Graph):
                 list(min_vertex.neighbors_dict.values())
             )
             for neighbor, weight in neighbor_weights:
-                current_distance = vertex_to_weight[neighbor]
-                # Update ONLY to reduce the weight of the distance
-                if weight < current_distance:
-                    vertex_to_weight[neighbor] = current_distance
+                if neighbor in vertex_to_weight:
+                    current_distance = vertex_to_weight[neighbor]
+                    # Update ONLY to reduce the weight of the distance
+                    if weight < current_distance:
+                        vertex_to_weight[neighbor] = weight
 
         # target vertex NOT FOUND
         return None
