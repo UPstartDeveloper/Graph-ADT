@@ -1,5 +1,6 @@
 from graphs.graph import Graph, Vertex
 from collections import deque
+from graphs.binaryheap import BinaryMinHeap
 
 class WeightedVertex(Vertex):
     def __init__(self, vertex_id):
@@ -140,7 +141,7 @@ class WeightedGraph(Graph):
                 if neighbor.get_id() not in seen:
                     seen.add(neighbor.get_id())
                     queue.append(neighbor)
-        # now need to sort
+        # now need to sort by weights
         edges.sort()
         # everything processed
         return edges
@@ -175,20 +176,24 @@ class WeightedGraph(Graph):
         # final spanning tree)
         mst_edges = list()
         # Build the MST - loop until we have # edges = # vertices - 1
+        index = 0
         while len(mst_edges) < len(self.vertex_dict) - 1:
             # get the smallest edge
-            next_edge = edges[0]
+            next_edge = edges[index]
             # determine if the edge can be added (must be in different sets)
             weight, vertex1_id, vertex2_id = next_edge
-            if (self.find(parent_map, vertex1_id) == self.find(parent_map, vertex2_id)) is False:
+            if self.find(parent_map, vertex1_id) != self.find(parent_map, vertex2_id):
                 # rearrange the edge
                 mst_edge = (vertex1_id, vertex2_id, weight)
                 mst_edges.append(mst_edge)
                 # remove it from the list of possible edges
                 edges.remove(next_edge)
-
+                # put the vertices of the edge in the same union
+                self.union(parent_map, vertex1_id, vertex2_id)
+            # if vertices in the same set, skip over and index next edge
+            else:
+                index += 1
         # Return the solution list
-        # print(f"Kruskal's Results: {mst_edges}")
         return sorted(mst_edges)
     
     '''Prim's Algorithm'''
@@ -219,10 +224,10 @@ class WeightedGraph(Graph):
             # remove it from the dictionary
             del vertex_to_weight[min_vertex]
             # add its weight to the total MST weight
-            print(f'Min dist: {vertex_to_weight}')
+            # print(f'Min dist: {vertex_to_weight}')
             weight += min_distance
             # B: Update that vertex's neighbors
-            print(vertex_to_weight)
+            # print(vertex_to_weight)
             for neighbor, weight in min_vertex.neighbors_dict.values():
                 if neighbor in vertex_to_weight:
                     current_distance = vertex_to_weight[neighbor]
@@ -255,12 +260,11 @@ class WeightedGraph(Graph):
             min_distance = min(list(vertex_to_weight.values()))
             # print(f'Min dist: {min_distance}')
             min_vertex = None
-            # remove it from the dictionary
+            # find the min vertex
             for vertex in vertex_to_weight:
                 if vertex_to_weight[vertex] == min_distance:
                     min_vertex = vertex
                     # print(f'Vertex: {vertex}')
-            del vertex_to_weight[vertex]
             # If target found, return its distance
             path_weight += min_distance
             if min_vertex.id == target_id:
@@ -275,7 +279,8 @@ class WeightedGraph(Graph):
                     # Update ONLY to reduce the weight of the distance
                     if weight < current_distance:
                         vertex_to_weight[neighbor] = weight
-
+            # remove the min vertex from the dict
+            del vertex_to_weight[vertex]
         # target vertex NOT FOUND
         return None
 
