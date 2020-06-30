@@ -125,7 +125,6 @@ class WeightedGraph(Graph):
         while queue:
             current_vertex_obj = queue.popleft()
             current_vertex_id = current_vertex_obj.get_id()
-
             # Process current node
             neighbor_weights = list(current_vertex_obj.neighbors_dict.values())
             for neighbor, weight in neighbor_weights:
@@ -135,7 +134,6 @@ class WeightedGraph(Graph):
                 # add if it's not already inside
                 if weight_edge not in edges and reverse_weight_edge not in edges:
                     edges.append(weight_edge)
-
             # Add its neighbors to the queue
             for neighbor in current_vertex_obj.get_neighbors():
                 if neighbor.get_id() not in seen:
@@ -248,10 +246,7 @@ class WeightedGraph(Graph):
         vertex_to_weight = dict()
         for vertex_obj in self.vertex_dict.values():
             vertex_to_weight[vertex_obj] = float('inf')
-
-        # B: Calculate the Path Weight, from starting vertex
-        path_weight = 0
-        # Choose one vertex and set its weight to 0
+        # B: Calculate Shortest Paths From starting vertex
         start_vertex = self.vertex_dict[start_id]
         vertex_to_weight[start_vertex] = 0
         while len(list(vertex_to_weight.items())) > 0:
@@ -263,7 +258,6 @@ class WeightedGraph(Graph):
                 if vertex_to_weight[vertex] == min_distance:
                     min_vertex = vertex
             # If target found, return its distance
-            path_weight += min_distance
             if min_vertex.id == target_id:
                 return vertex_to_weight[min_vertex]
             # B: Update that vertex's neighbors
