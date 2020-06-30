@@ -257,17 +257,15 @@ class WeightedGraph(Graph):
         while len(list(vertex_to_weight.items())) > 0:
             # Get the minimum-distance remaining vertex
             min_distance = min(list(vertex_to_weight.values()))
-            # print(f'Min dist: {min_distance}')
             min_vertex = None
             # find the min vertex
             for vertex in vertex_to_weight:
                 if vertex_to_weight[vertex] == min_distance:
                     min_vertex = vertex
-                    # print(f'Vertex: {vertex}')
             # If target found, return its distance
             path_weight += min_distance
             if min_vertex.id == target_id:
-                return path_weight 
+                return vertex_to_weight[min_vertex]
             # B: Update that vertex's neighbors
             neighbor_weights = (
                 list(min_vertex.neighbors_dict.values())
@@ -276,12 +274,15 @@ class WeightedGraph(Graph):
                 if neighbor in vertex_to_weight:
                     current_distance = vertex_to_weight[neighbor]
                     # Update ONLY to reduce the weight of the distance
-                    if weight < current_distance:
-                        vertex_to_weight[neighbor] = weight
+                    new_dist = weight + vertex_to_weight[min_vertex]
+                    if new_dist < current_distance:
+                        vertex_to_weight[neighbor] = new_dist
             # remove the min vertex from the dict
-            del vertex_to_weight[vertex]
+            del vertex_to_weight[min_vertex]
         # target vertex NOT FOUND
         return None
+
+    '''All Pairs Shortest Path Finding'''
 
     def floyd_warshall(self):
         """Returns an adjaceny matrix of all-pairs shortest paths in the
