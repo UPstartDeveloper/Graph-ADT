@@ -218,22 +218,21 @@ class WeightedGraph(Graph):
             # A Get the minimum-weighted remaining vertex
             min_distance = min(list(vertex_to_weight.values()))
             min_vertex = None
-            for vertex_obj, weight in vertex_to_weight.items():
-                if weight == min_distance:
+            for vertex_obj, vertex_weight in vertex_to_weight.items():
+                if vertex_weight == min_distance:
                     min_vertex = vertex_obj
             # remove it from the dictionary
             del vertex_to_weight[min_vertex]
             # add its weight to the total MST weight
-            # print(f'Min dist: {vertex_to_weight}')
             weight += min_distance
             # B: Update that vertex's neighbors
             # print(vertex_to_weight)
-            for neighbor, weight in min_vertex.neighbors_dict.values():
+            for neighbor, edge_weight in min_vertex.neighbors_dict.values():
                 if neighbor in vertex_to_weight:
                     current_distance = vertex_to_weight[neighbor]
                     # Update ONLY to reduce the weight of the distance
-                    if weight < current_distance:
-                        vertex_to_weight[neighbor] = weight
+                    if edge_weight < current_distance:
+                        vertex_to_weight[neighbor] = edge_weight
         # Return total weight of MST
         return weight
 
