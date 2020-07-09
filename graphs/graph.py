@@ -435,3 +435,53 @@ class Graph:
         for i in range(len(self.__vertex_dict)):
             solution.append(solution_stack.pop().get_id())
         return solution
+
+    def choose_color(self, vertex_id, vertex_id_color):
+        pass
+    
+    def greedy_coloring(self):
+        """Return a dictionary of vertex id -> color."""
+        vertex_id_color = {}
+        possible_colors = list(range(len(self.__vertex_dict)))
+        # print(possible_colors)
+        # TODO: Fill in the dictionary by visiting each vertex and checking the 
+        # colors of its neighbors, then assigning the “smallest” color which has 
+        # not yet been assigned.
+        # vertex_color = 0
+        for vertex_id in self.__vertex_dict:
+            # assign the current vertex a color if not already given
+            if vertex_id not in vertex_id_color:
+                # make sure it's not one of the neighbors' colors
+                neighbors = self.get_vertex(vertex_id).get_neighbors()
+                neighbors_colors = list()
+                for neighbor in neighbors:
+                    neighbor_id = neighbor.get_id()
+                    if neighbor_id in vertex_id_color:
+                        neighbors_colors.append(vertex_id_color[neighbor_id])
+                # choose the color
+                for color in possible_colors:
+                    if color not in neighbors_colors:
+                        vertex_id_color[vertex_id] = color
+        return vertex_id_color
+
+
+if __name__ == "__main__":
+    # testing the coloring function
+    graph = Graph(is_directed=False)
+    # add the vertices
+    graph.add_vertex('A')
+    graph.add_vertex('B')
+    graph.add_vertex('C')
+    graph.add_vertex('D')
+    graph.add_vertex('E')
+    # add the edges
+    graph.add_edge('A', 'B')
+    graph.add_edge('A', 'C')
+    graph.add_edge('B', 'C')
+    graph.add_edge('B', 'D')
+    graph.add_edge('C', 'D')
+    graph.add_edge('D', 'E')
+    # print the colorings
+    colors = graph.greedy_coloring()
+    print(f'Colorings: {colors}')
+

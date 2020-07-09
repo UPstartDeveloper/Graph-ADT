@@ -163,13 +163,13 @@ class WeightedGraph(Graph):
         (start_id, dest_id, weight) in the graph's minimum spanning tree.
         """
         # Create a list of all edges in the graph, sort them by weight 
-        start_id = list(self.vertex_dict.keys())[0]
-        edges = self.sort_edges(start_id)
+        start_id = list(self.vertex_dict.keys())[0]  # O(V)
+        edges = self.sort_edges(start_id)  # O(V + E)
         # Use dictionary 'parent_map' to map vertex -> its "parent". 
         # Initialized so that each vertex is its own parent.
         parent_map = dict()
         for vertex_obj in self.vertex_dict.values():
-            parent_map[vertex_obj.id] = vertex_obj.id
+            parent_map[vertex_obj.id] = vertex_obj.id  # O(V)
         # Create an empty list to hold the solution (i.e. all edges in the 
         # final spanning tree)
         mst_edges = list()
@@ -205,16 +205,16 @@ class WeightedGraph(Graph):
         """
         # initialize all vertex distances to INFINITY away
         vertex_to_weight = dict()
-        for vertex_obj in self.vertex_dict.values():
+        for vertex_obj in self.vertex_dict.values():  # O(V)
             vertex_to_weight[vertex_obj] = float('inf')
         # Choose one vertex and set its weight to 0
-        start_vertex = list(vertex_to_weight.keys())[0]
+        start_vertex = list(vertex_to_weight.keys())[0]  # O(1)
         vertex_to_weight[start_vertex] = 0
         # Calculate total weight of MST
         weight = 0
-        while len(list(vertex_to_weight.items())) > 0:
+        while len(list(vertex_to_weight.items())) > 0:  # V iterations
             # A Get the minimum-weighted remaining vertex
-            min_distance = min(list(vertex_to_weight.values()))
+            min_distance = min(list(vertex_to_weight.values()))  # O(V)
             min_vertex = None
             for vertex_obj, vertex_weight in vertex_to_weight.items():
                 if vertex_weight == min_distance:
