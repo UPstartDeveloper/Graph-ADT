@@ -443,11 +443,7 @@ class Graph:
         """Return a dictionary of vertex id -> color."""
         vertex_id_color = {}
         possible_colors = list(range(len(self.__vertex_dict)))
-        # print(possible_colors)
-        # TODO: Fill in the dictionary by visiting each vertex and checking the 
-        # colors of its neighbors, then assigning the “smallest” color which has 
-        # not yet been assigned.
-        # vertex_color = 0
+        # visiting each vertex
         for vertex_id in self.__vertex_dict:
             # assign the current vertex a color if not already given
             if vertex_id not in vertex_id_color:
@@ -458,7 +454,7 @@ class Graph:
                     neighbor_id = neighbor.get_id()
                     if neighbor_id in vertex_id_color:
                         neighbors_colors.append(vertex_id_color[neighbor_id])
-                # choose the color
+                # choose the color not yet assigned
                 for color in possible_colors:
                     if color not in neighbors_colors:
                         vertex_id_color[vertex_id] = color
