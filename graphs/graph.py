@@ -442,18 +442,18 @@ class Graph:
     def greedy_coloring(self):
         """Return a dictionary of vertex id -> color."""
         vertex_id_color = {}
-        possible_colors = list(range(len(self.__vertex_dict)))
+        possible_colors = set(range(len(self.__vertex_dict)))
         # visiting each vertex
         for vertex_id in self.__vertex_dict:
             # assign the current vertex a color if not already given
             if vertex_id not in vertex_id_color:
                 # make sure it's not one of the neighbors' colors
                 neighbors = self.get_vertex(vertex_id).get_neighbors()
-                neighbors_colors = list()
+                neighbors_colors = set()
                 for neighbor in neighbors:
                     neighbor_id = neighbor.get_id()
                     if neighbor_id in vertex_id_color:
-                        neighbors_colors.append(vertex_id_color[neighbor_id])
+                        neighbors_colors.add(vertex_id_color[neighbor_id])
                 # choose the color not yet assigned
                 for color in possible_colors:
                     if color not in neighbors_colors:
